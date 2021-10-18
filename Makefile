@@ -6,7 +6,7 @@
 #    By: user42 <user42@student.42.fr>              +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2021/10/05 11:40:11 by user42            #+#    #+#              #
-#    Updated: 2021/10/16 13:12:48 by user42           ###   ########.fr        #
+#    Updated: 2021/10/18 12:40:45 by user42           ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -19,7 +19,7 @@ CFLAGS = -Wall -Werror -Wextra -I includes/
 
 HEADER = woody-woodpacker.h
 
-MAIN = main
+MAIN = c_utils file_utils elf_utils segment gap main
 
 SRCS =	$(addsuffix .c, $(addprefix srcs/, $(MAIN)))
 
