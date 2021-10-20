@@ -6,7 +6,7 @@
 /*   By: user42 <user42@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/10/16 11:36:10 by user42            #+#    #+#             */
-/*   Updated: 2021/10/18 14:53:21 by user42           ###   ########.fr       */
+/*   Updated: 2021/10/20 11:29:11 by user42           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -32,8 +32,27 @@
 # define CYN  "\x1B[36m"
 # define WHT  "\x1B[37m"
 
-
 # define PAGE_SIZE		4096
+
+typedef struct		s_elf
+{
+	char			*fname;
+	void			*map;
+	int				fsize;
+	Elf64_Ehdr		*header;
+	Elf64_Phdr		*text_segment;
+	Elf64_Off		gap_offset;
+	Elf64_Xword		gap_size;
+}					t_elf;
+
+typedef struct		s_payload
+{
+	char			*fname;
+	void			*map;
+	int				fsize;
+	Elf64_Shdr		*text_section;
+}					t_payload;
+
 
 /* SEGMENT FUNCTIONS (manipulate elf segment, extend it) */
 Elf64_Off		extend_segment(void *d, size_t payload_size, int pg_nb);
