@@ -6,7 +6,7 @@
 /*   By: user42 <user42@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/10/16 11:36:10 by user42            #+#    #+#             */
-/*   Updated: 2021/10/20 11:29:11 by user42           ###   ########.fr       */
+/*   Updated: 2021/10/20 15:08:57 by user42           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -43,6 +43,8 @@ typedef struct		s_elf
 	Elf64_Phdr		*text_segment;
 	Elf64_Off		gap_offset;
 	Elf64_Xword		gap_size;
+	Elf64_Addr		encrypted_start;
+	Elf64_Xword		encrypted_size;
 }					t_elf;
 
 typedef struct		s_payload
@@ -50,7 +52,7 @@ typedef struct		s_payload
 	char			*fname;
 	void			*map;
 	int				fsize;
-	Elf64_Shdr		*text_section;
+	Elf64_Shdr		*txt_sec;
 }					t_payload;
 
 
@@ -58,7 +60,7 @@ typedef struct		s_payload
 Elf64_Off		extend_segment(void *d, size_t payload_size, int pg_nb);
 
 /* GAP FUNCTIONS (find the existing padding space after text segment) */
-Elf64_Phdr		*elf_find_gap(void *d, int fsize, size_t *gap_offset, size_t *gap_size);
+void			elf_find_gap(t_elf *elf);
 
 
 /* ELF UTILITIES (find section, modify elf content) */

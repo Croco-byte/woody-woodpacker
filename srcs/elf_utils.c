@@ -6,7 +6,7 @@
 /*   By: user42 <user42@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/10/18 12:22:13 by user42            #+#    #+#             */
-/*   Updated: 2021/10/18 15:05:46 by user42           ###   ########.fr       */
+/*   Updated: 2021/10/20 12:26:06 by user42           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -35,7 +35,7 @@ int		elf_mem_subst(void *m, int size, long pat, long val)
 	{
 		if (*(long *)(p + i) == pat)
 		{
-			printf("[*] Patching return address in payload:			0x%016lx -> 0x%016lx\n", pat, val);
+			printf("[*] Patching magic pattern in payload:			0x%016lx -> 0x%016lx\n", pat, val);
 			*(long *)(p + i) = val;
 			return (0);
 		}

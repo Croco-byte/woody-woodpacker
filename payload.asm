@@ -18,9 +18,9 @@ _start:
 		mov rdx, msg_len
 		syscall
 
-		; Calling mprotect to make text section writable
-		mov rdi, 0x0000000000400000
-		mov rsi, 0x0000000000500000
+		; Calling mprotect to make encrypted sections writable
+		mov rdi, [rel alignedaddr]
+		mov rsi, [rel size]
 		mov rdx, 7
 		mov rax, 10
 		syscall
@@ -43,18 +43,19 @@ _start:
 		pop rdi
 		pop rax
 
-		mov r15, [rel startaddr]
+		mov r15, [rel retaddr]
 		jmp r15
 
 align 8
 	debug		db "Once",0x0a,0
 	debug_len	equ $ - debug
-	msg			db "... Woody ...",0x0a,0
+	msg			db "... Woody...",0x0a,0
 	msg_len		equ $ - msg
 	retaddr		dq 0x1111111111111111
 	key			dq 0x2222222222222222
 	startaddr	dq 0x3333333333333333
 	size		dq 0x4444444444444444
+	alignedaddr	dq 0x5555555555555555
 
 
 
