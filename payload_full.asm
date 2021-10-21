@@ -18,14 +18,14 @@ _start:
 		mov rdx, msg_len
 		syscall
 
-		; Calling mprotect to make encrypted sections writable
+		; Calling mprotect to make encrypted sections before payload writable
 		mov rdi, [rel alignedaddr]
 		mov rsi, [rel size]
 		mov rdx, 7
 		mov rax, 10
 		syscall
 
-		; Decrypting the encrypted sections
+		; Decrypting the encrypted sections before payload
 		mov rax, [rel startaddr]
 		mov rcx, [rel size]
 		mov rdx, [rel key]
@@ -36,6 +36,25 @@ _start:
 		inc rax
 		cmp rax, rcx
 		jne decrypt
+
+		; Calling mprotect to make encrypted sections after payload writable
+		mov rdi, [rel aligned2]
+		mov rsi, [rel size2]
+		mov rdx, 7
+		mov rax, 10
+		syscall
+
+		; Decrypting the encrypted sections after payload
+		mov rax, [rel startaddr2]
+		mov rcx, [rel size2]
+		mov rdx, [rel key]
+		add rcx, rax
+
+	decrypt2:
+		xor byte[rax], 0xa5
+		inc rax
+		cmp rax, rcx
+		jne decrypt2
 
 		; Restoring the registers to their initial state
 		pop rcx
@@ -58,8 +77,9 @@ align 8
 	startaddr	dq 0x3333333333333333
 	size		dq 0x4444444444444444
 	alignedaddr	dq 0x5555555555555555
-
-
+	startaddr2	dq 0x6666666666666666
+	size2		dq 0x7777777777777777
+	aligned2	dq 0x8888888888888888
 
 
 ;		push rax

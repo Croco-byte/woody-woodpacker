@@ -6,7 +6,7 @@
 /*   By: user42 <user42@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/10/16 11:36:10 by user42            #+#    #+#             */
-/*   Updated: 2021/10/20 15:08:57 by user42           ###   ########.fr       */
+/*   Updated: 2021/10/21 23:14:49 by user42           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -38,26 +38,30 @@ typedef struct		s_elf
 {
 	char			*fname;
 	void			*map;
-	int				fsize;
+	uint64_t		fsize;
 	Elf64_Ehdr		*header;
 	Elf64_Phdr		*text_segment;
-	Elf64_Off		gap_offset;
+	Elf64_Off		injection_point;
 	Elf64_Xword		gap_size;
-	Elf64_Addr		encrypted_start;
-	Elf64_Xword		encrypted_size;
+
+	Elf64_Addr		enc_start_before;
+	Elf64_Xword		enc_size_before;
+	Elf64_Addr		enc_start_after;
+	Elf64_Xword		enc_size_after;
+
 }					t_elf;
 
 typedef struct		s_payload
 {
 	char			*fname;
 	void			*map;
-	int				fsize;
+	uint64_t		fsize;
 	Elf64_Shdr		*txt_sec;
 }					t_payload;
 
 
 /* SEGMENT FUNCTIONS (manipulate elf segment, extend it) */
-Elf64_Off		extend_segment(void *d, size_t payload_size, int pg_nb);
+void			extend_segment(t_elf *elf, size_t payload_size, int pg_nb);
 
 /* GAP FUNCTIONS (find the existing padding space after text segment) */
 void			elf_find_gap(t_elf *elf);
@@ -66,13 +70,15 @@ void			elf_find_gap(t_elf *elf);
 /* ELF UTILITIES (find section, modify elf content) */
 Elf64_Shdr		*elf_find_section(void *data, char *sec_name);
 int				elf_mem_subst(void *m, int size, long pat, long val);
+Elf64_Phdr		*elf_find_text_segment(t_elf *elf);
+
 
 
 /* FILE UTILITIES (read-write-open-map) */
 int				get_file_size(int fd, char *fname);
 void			write_to_output(char *name, void *data, size_t size);
 void			add_to_output(char *name, void *data, size_t size);
-void			*elf_map_file(char *fname, int *size);
+void			*elf_map_file(char *fname, uint64_t *size);
 
 
 /* C UTILITIES */

@@ -6,7 +6,7 @@
 /*   By: user42 <user42@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/10/18 11:47:53 by user42            #+#    #+#             */
-/*   Updated: 2021/10/18 14:56:32 by user42           ###   ########.fr       */
+/*   Updated: 2021/10/21 23:06:53 by user42           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -58,7 +58,7 @@ void	add_to_output(char *name, void *data, size_t size)
 	free(outname);
 }
 
-void	*elf_map_file(char *fname, int *size)
+void	*elf_map_file(char *fname, uint64_t *size)
 {
 	int		fd;
 	void	*map;
@@ -75,7 +75,7 @@ void	*elf_map_file(char *fname, int *size)
 		fprintf(stderr, "[!] Error: couldn't map file %s\n", fname);
 		exit(1);
 	}
-	printf("[*] Mapped file %s to				%p (%d bytes)\n", fname, map, *size);
+	printf("[*] Mapped file %s to				%p (%lu bytes)\n", fname, map, *size);
 	close(fd);
 	return (map);
 }

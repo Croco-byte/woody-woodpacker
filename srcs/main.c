@@ -6,49 +6,75 @@
 /*   By: user42 <user42@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/10/16 11:35:47 by user42            #+#    #+#             */
-/*   Updated: 2021/10/20 16:25:58 by user42           ###   ########.fr       */
+/*   Updated: 2021/10/21 23:33:23 by user42           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "woody-woodpacker.h"
 
-void	inject_in_gap(t_elf *elf, t_payload *payload)
+void	write_in_gap(t_elf *elf)
 {
-	printf(GRN "\n[+] Enough space to inject payload in gap. Injecting on the fly!\n" RES);
-	memmove(elf->map + elf->gap_offset, payload->map + payload->txt_sec->sh_offset, payload->txt_sec->sh_size);
-	printf("[*] Injected payload to offset:				0x%08lu\n", elf->gap_offset);
-	printf("[*] Patching ELF entry point to payload\n");
-	elf->header->e_entry = (Elf64_Addr)(elf->text_segment->p_vaddr + elf->gap_offset);
 	write_to_output(elf->fname, elf->map, elf->fsize);
-	printf(GRN "[+] Injection successfull\n" RES);
+	printf(GRN "[+] Injection complete\n" RES);
 }
 
-void	extend_and_inject(t_elf *elf, t_payload *payload)
+void	write_after_extension(t_elf *elf, t_payload *payload, int pages_to_add)
 {
-	int			pages_to_add = ((payload->txt_sec->sh_size - elf->gap_size) / PAGE_SIZE) + 1;
 	int			bytes_to_add = pages_to_add * PAGE_SIZE;
 	char		*zeros;
 
-	printf(GRN "\n[+] Not enough space in gap. Extending .text segment\n" RES);
 	zeros = malloc((bytes_to_add - payload->txt_sec->sh_size) * sizeof(char));
 	bzero(zeros, bytes_to_add - payload->txt_sec->sh_size);
-	printf("[*] We need to add this many pages:			%u (we miss %lu bytes)\n", pages_to_add, payload->txt_sec->sh_size - elf->gap_size);
-	Elf64_Off offset = extend_segment(elf->map, payload->txt_sec->sh_size, pages_to_add);
-	printf("[*] The payload can now be injected at offset:		0x%08lx\n", offset);
-	printf("[*] Patching ELF entry point to payload\n");
-	elf->header->e_entry = elf->text_segment->p_vaddr + offset;
-	printf("[*] Writing until injection point			(%lu bytes)\n", offset);
-	write_to_output(elf->fname, elf->map, offset);
+	printf("[*] Writing until injection point			(%lu bytes)\n", elf->injection_point);
+	write_to_output(elf->fname, elf->map, elf->injection_point);
 	printf("[*] Writing payload at injection point			(%lu bytes)\n",payload->txt_sec->sh_size);
 	add_to_output(elf->fname, payload->map + payload->txt_sec->sh_offset, payload->txt_sec->sh_size);
 	printf("[*] Writing additionnal padding				(%lu bytes)\n", bytes_to_add - payload->txt_sec->sh_size);
 	add_to_output(elf->fname, zeros, bytes_to_add - payload->txt_sec->sh_size);
-	printf("[*] Writing rest of parent file				(%lu bytes)\n", (elf->fsize) - (offset));
-	add_to_output(elf->fname, elf->map + offset, (elf->fsize) - (offset));
-	printf(GRN "[+] Injection successfull\n" RES);
+	printf("[*] Writing rest of parent file				(%lu bytes)\n", (elf->fsize) - (elf->injection_point));
+	add_to_output(elf->fname, elf->map + elf->injection_point, (elf->fsize) - (elf->injection_point));
+	printf(GRN "[+] Injection complete\n" RES);
+	free(zeros);
 }
 
-void	encrypt_sections(t_elf *elf)
+void	inject_in_gap(t_elf *elf, t_payload *payload)
+{
+	printf(GRN "\n[+] Enough space to inject payload in gap. Injecting on the fly!\n" RES);
+	memmove(elf->map + elf->injection_point, payload->map + payload->txt_sec->sh_offset, payload->txt_sec->sh_size);
+	printf("[*] Injected payload to offset:				0x%08lu\n", elf->injection_point);
+	printf("[*] Patching ELF entry point to payload\n");
+	elf->header->e_entry = (Elf64_Addr)(elf->text_segment->p_vaddr + elf->injection_point);
+	write_in_gap(elf);
+}
+
+void	extend_and_inject(t_elf *elf, t_payload *payload)
+{
+	int pages_to_add = ((payload->txt_sec->sh_size - elf->gap_size) / PAGE_SIZE) + 1;
+
+	printf(GRN "\n[+] Not enough space in gap. Extending .text segment\n" RES);
+	printf("[*] We need to add this many pages:			%u (missing %lu bytes)\n", pages_to_add, payload->txt_sec->sh_size - elf->gap_size);
+	extend_segment(elf, payload->txt_sec->sh_size, pages_to_add);
+	printf("[*] The payload can now be injected at offset:		0x%08lu\n", elf->injection_point);
+	printf("[*] Patching ELF entry point to payload\n");
+	elf->header->e_entry = elf->text_segment->p_vaddr + elf->injection_point;
+	write_after_extension(elf, payload, pages_to_add);
+}
+
+void	encrypt_sec(t_elf *elf, Elf64_Shdr *sec)
+{
+	size_t j = 0;
+	if (!sec)
+		return ;
+	char *ptr = (char *)(elf->map + sec->sh_offset);
+	while (j < sec->sh_size)
+	{
+		*ptr ^= 0xa5;
+		j++;
+		ptr++;
+	}
+}
+
+void	encrypt_light(t_elf *elf)
 {
 	Elf64_Shdr *sec_headers = (Elf64_Shdr *)(elf->map + elf->header->e_shoff);
 	Elf64_Shdr *sec_str_h = &(sec_headers[elf->header->e_shstrndx]);
@@ -57,35 +83,41 @@ void	encrypt_sections(t_elf *elf)
 
 	for (size_t i = 0; i < elf->header->e_shnum; i++)
 	{
-		if (sec_headers[i].sh_type == SHT_PROGBITS && sec_headers[i].sh_flags & SHF_ALLOC && sec_headers[i].sh_flags & SHF_EXECINSTR
-		&& (strcmp(sec_str_p + sec_headers[i].sh_name, ".fini") && strcmp(sec_str_p + sec_headers[i].sh_name, ".init")))
+		if (!strcmp(sec_str_p + sec_headers[i].sh_name, ".text") || !strcmp(sec_str_p + sec_headers[i].sh_name, ".plt")
+		|| !strcmp(sec_str_p + sec_headers[i].sh_name, ".data") || !strcmp(sec_str_p + sec_headers[i].sh_name, ".bss"))
 		{
 			printf("[*] Encrypting section %s\n", sec_str_p + sec_headers[i].sh_name);
-			if (j == 0)
-				elf->encrypted_start = (long)(sec_headers[i].sh_addr);
-			elf->encrypted_size += sec_headers[i].sh_size;
-			j = 0;
-			char		*ptr = (char *)(elf->map + sec_headers[i].sh_offset);
-			while (j < sec_headers[i].sh_size)
+			if (sec_headers[i].sh_offset > (elf->text_segment->p_offset + elf->text_segment->p_filesz))
 			{
-				*ptr ^= 0xa5;
-				j++;
-				ptr++;
+				printf("[DEBUG] This section is AFTER the end of the first PT_LOAD segment (so after our injection point)\n");
+					if (elf->enc_size_after == 0)
+				elf->enc_start_after = (long)(sec_headers[i].sh_addr);
+				j = 0;
+				char		*ptr = (char *)(elf->map + sec_headers[i].sh_offset);
+				while (j < sec_headers[i].sh_size)
+				{
+					*ptr ^= 0xa5;
+					j++;
+					ptr++;
+					elf->enc_size_after++;
+				}
+			}
+			else
+			{
+				printf("[DEBUG] This section is BEFORE the end of the first PT_LOAD segment (so before our injection point)\n");
+				if (elf->enc_size_before == 0)
+					elf->enc_start_before = (long)(sec_headers[i].sh_addr);
+				j = 0;
+				char		*ptr = (char *)(elf->map + sec_headers[i].sh_offset);
+				while (j < sec_headers[i].sh_size)
+				{
+					*ptr ^= 0xa5;
+					j++;
+					ptr++;
+					elf->enc_size_before++;
+				}
 			}
 		}
-	}
-}
-
-void	encrypt_section(void *d, Elf64_Shdr *section)
-{
-	size_t		i = 0;
-	char		*ptr = (char *)(d + section->sh_offset);
-
-	while (i < section->sh_size)
-	{
-		*ptr ^= 0xa5;
-		i++;
-		ptr++;
 	}
 }
 
@@ -96,10 +128,12 @@ void	init_elf(t_elf *elf, char *fname)
 	elf->fsize				= 0;
 	elf->header				= 0;
 	elf->text_segment		= 0;
-	elf->gap_offset			= 0;
+	elf->injection_point	= 0;
 	elf->gap_size			= 0;
-	elf->encrypted_start	= 0;
-	elf->encrypted_size		= 0;
+	elf->enc_start_before	= 0;
+	elf->enc_size_before	= 0;
+	elf->enc_start_after	= 0;
+	elf->enc_size_after		= 0;
 }
 
 void	init_payload(t_payload *payload, char *fname)
@@ -114,6 +148,8 @@ void	parse_elf(t_elf *elf)
 {
 	elf->map				= elf_map_file(elf->fname, &elf->fsize);
 	elf->header				= (Elf64_Ehdr *)elf->map;
+	elf->text_segment		= elf_find_text_segment(elf);
+	elf->injection_point	= elf->text_segment->p_offset + elf->text_segment->p_filesz;
 	elf_find_gap(elf);
 }
 
@@ -123,20 +159,26 @@ void	parse_payload(t_payload *payload)
 	payload->txt_sec		= elf_find_section(payload->map, ".text");
 }
 
-void	patch_payload(t_elf *elf, t_payload *payload, Elf64_Shdr *text_sec)
+void	patch_payload(t_elf *elf, t_payload *payload)
 {
-	(void)text_sec;
-	Elf64_Addr	aligned_addr;
+	Elf64_Addr	aligned_addr_before;
+	Elf64_Addr	aligned_addr_after;
 
-	aligned_addr = (text_sec->sh_addr);
-	aligned_addr = ((PAGE_SIZE-1)&aligned_addr) ? ((aligned_addr) & ~(PAGE_SIZE-1)) : aligned_addr;
+	aligned_addr_before = (elf->enc_start_before);
+	aligned_addr_before = ((PAGE_SIZE-1)&aligned_addr_before) ? ((aligned_addr_before) & ~(PAGE_SIZE-1)) : aligned_addr_before;
+	aligned_addr_after = (elf->enc_start_after);
+	aligned_addr_after = ((PAGE_SIZE-1)&aligned_addr_after) ? ((aligned_addr_after) & ~(PAGE_SIZE-1)) : aligned_addr_after;
 
 	elf_mem_subst(payload->map + payload->txt_sec->sh_offset, payload->txt_sec->sh_size, 0x1111111111111111, (long)elf->header->e_entry);
 	elf_mem_subst(payload->map + payload->txt_sec->sh_offset, payload->txt_sec->sh_size, 0x2222222222222222, (long)0xa5);
-	elf_mem_subst(payload->map + payload->txt_sec->sh_offset, payload->txt_sec->sh_size, 0x3333333333333333, elf->encrypted_start);
-	elf_mem_subst(payload->map + payload->txt_sec->sh_offset, payload->txt_sec->sh_size, 0x4444444444444444, elf->encrypted_size);
-	elf_mem_subst(payload->map + payload->txt_sec->sh_offset, payload->txt_sec->sh_size, 0x5555555555555555, aligned_addr);
+	elf_mem_subst(payload->map + payload->txt_sec->sh_offset, payload->txt_sec->sh_size, 0x3333333333333333, elf->enc_start_before);
+	elf_mem_subst(payload->map + payload->txt_sec->sh_offset, payload->txt_sec->sh_size, 0x4444444444444444, elf->enc_size_before);
+	elf_mem_subst(payload->map + payload->txt_sec->sh_offset, payload->txt_sec->sh_size, 0x5555555555555555, aligned_addr_before);
+	elf_mem_subst(payload->map + payload->txt_sec->sh_offset, payload->txt_sec->sh_size, 0x6666666666666666, elf->enc_start_after);
+	elf_mem_subst(payload->map + payload->txt_sec->sh_offset, payload->txt_sec->sh_size, 0x7777777777777777, elf->enc_size_after);
+	elf_mem_subst(payload->map + payload->txt_sec->sh_offset, payload->txt_sec->sh_size, 0x8888888888888888, aligned_addr_after);
 }
+
 
 int		main(int argc, char **argv)
 {
@@ -154,21 +196,15 @@ int		main(int argc, char **argv)
 	init_payload(&payload, argv[2]);
 	parse_elf(&elf);
 	parse_payload(&payload);
-
 	printf("[*] Shellcode in payload file at:			0x%08lx\n", payload.txt_sec->sh_offset);
 	printf(YEL "[*] Size of payload (in bytes):				%lu\n" RES, payload.txt_sec->sh_size);
 
-	/* === Encryption experimentation === */
-	Elf64_Shdr *text_sec = elf_find_section(elf.map, ".text");
-	encrypt_sections(&elf);
-//	encrypt_section(elf.map, text_sec);
-	patch_payload(&elf, &payload, text_sec);
-	/* === End of experimentation === */
+	encrypt_light(&elf);
+	patch_payload(&elf, &payload);
 
 	if (payload.txt_sec->sh_size < elf.gap_size)
 		inject_in_gap(&elf, &payload);
 	else
 		extend_and_inject(&elf, &payload);
-
 	return (0);
 }

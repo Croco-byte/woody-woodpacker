@@ -14,7 +14,7 @@ NAME = woody-woodpacker
 
 CC = clang
 
-CFLAGS = -Wall -Werror -Wextra -I includes/
+CFLAGS = -Wall -Werror -Wextra -fsanitize=address -g3 -fno-omit-frame-pointer -I includes/
 # -fsanitize=address -g3 -fno-omit-frame-pointer 
 
 HEADER = woody-woodpacker.h
