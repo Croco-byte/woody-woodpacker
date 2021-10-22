@@ -3,10 +3,10 @@
 #                                                         :::      ::::::::    #
 #    Makefile                                           :+:      :+:    :+:    #
 #                                                     +:+ +:+         +:+      #
-#    By: user42 <user42@student.42.fr>              +#+  +:+       +#+         #
+#    By: qroland <qroland@student.42.fr>            +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2021/10/05 11:40:11 by user42            #+#    #+#              #
-#    Updated: 2021/10/19 15:03:12 by user42           ###   ########.fr        #
+#    Updated: 2021/10/22 12:08:36 by qroland          ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -19,7 +19,7 @@ CFLAGS = -Wall -Werror -Wextra -fsanitize=address -g3 -fno-omit-frame-pointer -I
 
 HEADER = woody-woodpacker.h
 
-MAIN = c_utils file_utils elf_utils segment gap main
+MAIN = inject patch encrypt init parse c_utils file_utils elf_utils segment gap main
 
 SRCS =	$(addsuffix .c, $(addprefix srcs/, $(MAIN)))
 

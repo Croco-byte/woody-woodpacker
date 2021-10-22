@@ -19,8 +19,8 @@ _start:
 		syscall
 
 		; Calling mprotect to make encrypted sections writable
-		mov rdi, [rel alignedaddr]
-		mov rsi, [rel size]
+		mov rdi, 0x0000000000001000
+		mov rsi, 0x0000000000001000
 		mov rdx, 7
 		mov rax, 10
 		syscall

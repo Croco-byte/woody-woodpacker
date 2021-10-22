@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   elf_utils.c                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: user42 <user42@student.42.fr>              +#+  +:+       +#+        */
+/*   By: qroland <qroland@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/10/18 12:22:13 by user42            #+#    #+#             */
-/*   Updated: 2021/10/21 22:49:04 by user42           ###   ########.fr       */
+/*   Updated: 2021/10/22 12:20:46 by qroland          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -52,7 +52,6 @@ int		elf_mem_subst(void *m, int size, long pat, long val)
 	{
 		if (*(long *)(p + i) == pat)
 		{
-			printf("[*] Patching magic pattern in payload:			0x%016lx -> 0x%016lx\n", pat, val);
 			*(long *)(p + i) = val;
 			return (0);
 		}

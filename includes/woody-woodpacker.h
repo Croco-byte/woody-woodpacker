@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   woody-woodpacker.h                                 :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: user42 <user42@student.42.fr>              +#+  +:+       +#+        */
+/*   By: qroland <qroland@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/10/16 11:36:10 by user42            #+#    #+#             */
-/*   Updated: 2021/10/21 23:14:49 by user42           ###   ########.fr       */
+/*   Updated: 2021/10/22 13:04:35 by qroland          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -59,9 +59,34 @@ typedef struct		s_payload
 	Elf64_Shdr		*txt_sec;
 }					t_payload;
 
+/* INIT FUNCTIONS */
+void			init_elf(t_elf *elf, char *fname);
+void			init_payload(t_payload *payload, char *fname);
+
+
+/* PARSE FUNCTIONS */
+void			parse_elf(t_elf *elf);
+void			parse_payload(t_payload *payload);
+
+
+/* ENCRYPTION FUNCTIONS */
+void			encrypt_sec(t_elf *elf, Elf64_Shdr *sec);
+void			encrypt_light(t_elf *elf);
+void			encrypt_basic(t_elf *elf);
+
+
+/* PALOAD PATCH FUNCTIONS */
+void			patch_payload_basic(t_elf *elf, t_payload *payload);
+void			patch_payload_full(t_elf *elf, t_payload *payload);
+
+
+/* INJECTION FUNCTIONS */
+void			inject_in_gap(t_elf *elf, t_payload *payload);
+void			extend_and_inject(t_elf *elf, t_payload *payload);
 
 /* SEGMENT FUNCTIONS (manipulate elf segment, extend it) */
 void			extend_segment(t_elf *elf, size_t payload_size, int pg_nb);
+
 
 /* GAP FUNCTIONS (find the existing padding space after text segment) */
 void			elf_find_gap(t_elf *elf);
