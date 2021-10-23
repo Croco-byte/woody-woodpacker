@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   inject.c                                           :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: qroland <qroland@student.42.fr>            +#+  +:+       +#+        */
+/*   By: user42 <user42@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/10/22 12:07:26 by qroland           #+#    #+#             */
-/*   Updated: 2021/10/22 14:46:12 by qroland          ###   ########.fr       */
+/*   Updated: 2021/10/22 17:23:44 by user42           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -42,10 +42,8 @@ void	inject_in_gap(t_elf *elf, t_payload *payload)
 	printf(GRN "\n[+] Enough space to inject payload in gap. Injecting on the fly!\n" RES);
 	memmove(elf->map + elf->injection_point, payload->map + payload->txt_sec->sh_offset, payload->txt_sec->sh_size);
 	printf("[*] Injected payload to offset:				0x%08lx\n", elf->injection_point);
-    printf("DEBUG text_segment vaddr is 0x%08lx\n", elf->text_segment->p_vaddr);
-    printf("DEBUG injection_point is 0x%08lx\n", elf->injection_point);
-    printf("[*] Patching ELF entry point to payload 0x%08lx\n", (elf->text_segment->p_vaddr + elf->injection_point));
-	elf->header->e_entry = (Elf64_Addr)(elf->injection_point);      // + elf->text_segment->p_vaddr + 
+	printf("[*] Patching ELF entry point to payload 0x%08lx\n", elf->text_segment->p_vaddr + (elf->injection_point - elf->text_segment->p_offset));
+	elf->header->e_entry = (Elf64_Addr)(elf->text_segment->p_vaddr + (elf->injection_point - elf->text_segment->p_offset));
 	write_in_gap(elf);
 }
 

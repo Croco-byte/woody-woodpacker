@@ -19,8 +19,8 @@ _start:
 		syscall
 
 		; Calling mprotect to make encrypted sections writable
-		mov rdi, 0x0000000000001000
-		mov rsi, 0x0000000000001000
+		mov rdi, [rel alignedaddr]
+		mov rsi, [rel size]
 		mov rdx, 7
 		mov rax, 10
 		syscall
@@ -30,6 +30,7 @@ _start:
 		mov rcx, [rel size]
 		mov rdx, [rel key]
 		add rcx, rax
+		jmp decrypt
 
 	decrypt:
 		xor byte[rax], 0xa5

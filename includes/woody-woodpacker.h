@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   woody-woodpacker.h                                 :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: qroland <qroland@student.42.fr>            +#+  +:+       +#+        */
+/*   By: user42 <user42@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/10/16 11:36:10 by user42            #+#    #+#             */
-/*   Updated: 2021/10/22 13:04:35 by qroland          ###   ########.fr       */
+/*   Updated: 2021/10/23 15:34:40 by user42           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -49,6 +49,8 @@ typedef struct		s_elf
 	Elf64_Addr		enc_start_after;
 	Elf64_Xword		enc_size_after;
 
+	Elf64_Off		enc_off;
+
 }					t_elf;
 
 typedef struct		s_payload
@@ -78,6 +80,7 @@ void			encrypt_basic(t_elf *elf);
 /* PALOAD PATCH FUNCTIONS */
 void			patch_payload_basic(t_elf *elf, t_payload *payload);
 void			patch_payload_full(t_elf *elf, t_payload *payload);
+void			patch_payload_pie(t_elf *elf, t_payload *payload);
 
 
 /* INJECTION FUNCTIONS */

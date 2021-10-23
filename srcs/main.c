@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   main.c                                             :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: qroland <qroland@student.42.fr>            +#+  +:+       +#+        */
+/*   By: user42 <user42@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/10/16 11:35:47 by user42            #+#    #+#             */
-/*   Updated: 2021/10/22 15:07:34 by qroland          ###   ########.fr       */
+/*   Updated: 2021/10/23 15:35:13 by user42           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -32,7 +32,8 @@ int		main(int argc, char **argv)
 	printf(YEL "[*] Size of payload (in bytes):				%lu\n" RES, payload.txt_sec->sh_size);
 
 	encrypt_basic(&elf);
-	patch_payload_basic(&elf, &payload);
+//	patch_payload_basic(&elf, &payload);
+	patch_payload_pie(&elf, &payload);
 
 	if (payload.txt_sec->sh_size < elf.gap_size)
 		inject_in_gap(&elf, &payload);
