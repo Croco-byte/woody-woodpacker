@@ -6,7 +6,7 @@
 /*   By: user42 <user42@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/10/22 12:01:15 by qroland           #+#    #+#             */
-/*   Updated: 2021/10/23 15:33:39 by user42           ###   ########.fr       */
+/*   Updated: 2021/10/24 12:31:26 by user42           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -30,13 +30,12 @@ void    encrypt_basic(t_elf *elf)
 {
 	printf("[*] Encrypt mode is : BASIC\n[*] Encrypting section .text\n");
 	Elf64_Shdr  *txt_sec    = elf_find_section(elf->map, ".text");
-	elf->enc_off			= txt_sec->sh_offset;
 	elf->enc_start_before   = (long)(txt_sec->sh_addr);
 	elf->enc_size_before    = txt_sec->sh_size;
 	encrypt_sec(elf, txt_sec);
 }
 
-void	encrypt_light(t_elf *elf)
+void	encrypt_full(t_elf *elf)
 {
     printf("[*] Encrypt mode is : FULL\n");
 	Elf64_Shdr *sec_headers = (Elf64_Shdr *)(elf->map + elf->header->e_shoff);

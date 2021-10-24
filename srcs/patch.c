@@ -6,7 +6,7 @@
 /*   By: user42 <user42@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/10/22 12:04:18 by qroland           #+#    #+#             */
-/*   Updated: 2021/10/23 15:37:39 by user42           ###   ########.fr       */
+/*   Updated: 2021/10/24 12:42:02 by user42           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -59,14 +59,14 @@ void	patch_payload_full(t_elf *elf, t_payload *payload)
 	elf_mem_subst(payload->map + payload->txt_sec->sh_offset, payload->txt_sec->sh_size, 0x8888888888888888, aligned_addr_after);
 }
 
-void	patch_payload_pie(t_elf *elf, t_payload *payload)
+void	patch_payload_pic(t_elf *elf, t_payload *payload)
 {
 	printf("[*] Patching ret addr offset:				0x%016lx -> 0x%016lx\n", 0x1111111111111111, elf->injection_point - elf->text_segment->p_offset);
 	elf_mem_subst(payload->map + payload->txt_sec->sh_offset, payload->txt_sec->sh_size, 0x1111111111111111, elf->injection_point - elf->text_segment->p_offset);
 	printf("[*] Patching key:					0x%016lx -> 0x%016lx\n", 0x2222222222222222, (long)0xa5);
 	elf_mem_subst(payload->map + payload->txt_sec->sh_offset, payload->txt_sec->sh_size, 0x2222222222222222, (long)0xa5);
-	printf("[*] Patching encrypted code offset:			0x%016lx -> 0x%016lx\n", 0x3333333333333333, elf->enc_off - elf->text_segment->p_offset);
-	elf_mem_subst(payload->map + payload->txt_sec->sh_offset, payload->txt_sec->sh_size, 0x3333333333333333, elf->enc_off - elf->text_segment->p_offset);
+	printf("[*] Patching encrypted code offset:			0x%016lx -> 0x%016lx\n", 0x3333333333333333, elf->enc_start_before - elf->text_segment->p_vaddr);
+	elf_mem_subst(payload->map + payload->txt_sec->sh_offset, payload->txt_sec->sh_size, 0x3333333333333333, elf->enc_start_before - elf->text_segment->p_vaddr);
 	printf("[*] Patching encrypted size:				0x%016lx -> 0x%016lx\n", 0x4444444444444444, elf->enc_size_before);
 	elf_mem_subst(payload->map + payload->txt_sec->sh_offset, payload->txt_sec->sh_size, 0x4444444444444444, elf->enc_size_before);
 }

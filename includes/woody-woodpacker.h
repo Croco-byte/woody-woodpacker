@@ -6,7 +6,7 @@
 /*   By: user42 <user42@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/10/16 11:36:10 by user42            #+#    #+#             */
-/*   Updated: 2021/10/23 15:34:40 by user42           ###   ########.fr       */
+/*   Updated: 2021/10/24 13:16:52 by user42           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -34,6 +34,10 @@
 
 # define PAGE_SIZE		4096
 
+# define PDC_BASIC		0
+# define PDC_FULL		1
+# define PIC_BASIC		2
+
 typedef struct		s_elf
 {
 	char			*fname;
@@ -48,9 +52,6 @@ typedef struct		s_elf
 	Elf64_Xword		enc_size_before;
 	Elf64_Addr		enc_start_after;
 	Elf64_Xword		enc_size_after;
-
-	Elf64_Off		enc_off;
-
 }					t_elf;
 
 typedef struct		s_payload
@@ -73,14 +74,14 @@ void			parse_payload(t_payload *payload);
 
 /* ENCRYPTION FUNCTIONS */
 void			encrypt_sec(t_elf *elf, Elf64_Shdr *sec);
-void			encrypt_light(t_elf *elf);
+void			encrypt_full(t_elf *elf);
 void			encrypt_basic(t_elf *elf);
 
 
 /* PALOAD PATCH FUNCTIONS */
 void			patch_payload_basic(t_elf *elf, t_payload *payload);
 void			patch_payload_full(t_elf *elf, t_payload *payload);
-void			patch_payload_pie(t_elf *elf, t_payload *payload);
+void			patch_payload_pic(t_elf *elf, t_payload *payload);
 
 
 /* INJECTION FUNCTIONS */
@@ -104,8 +105,8 @@ Elf64_Phdr		*elf_find_text_segment(t_elf *elf);
 
 /* FILE UTILITIES (read-write-open-map) */
 int				get_file_size(int fd, char *fname);
-void			write_to_output(char *name, void *data, size_t size);
-void			add_to_output(char *name, void *data, size_t size);
+void			write_to_output(void *data, size_t size);
+void			add_to_output(void *data, size_t size);
 void			*elf_map_file(char *fname, uint64_t *size);
 
 
