@@ -1,0 +1,43 @@
+>>> WHEN BUGGING / bytes_to_add < payload size
+Gap bytes available :		1696
+Payload size :			8286
+Missing :			6590
+
+Pages to add :			2
+Bytes to add :			8192
+
+Payload repartition :
+	> 1696 bytes in gap			| 1696
+	> 4096 bytes in 1rst added page		| 5792
+	> 2494 bytes in 2nd added page		| 8286
+
+The second page needs 1602 padding
+
+
+
+>>> WHEN WORKING / bytes_to_add > payload size
+Gap bytes available :		1696
+Payload size :			8022
+Missing :			6326
+
+Pages to add :			2
+Bytes to add :			8192
+
+Payload repartition :
+	> 1696 bytes in gap			| 1696
+	> 4096 bytes in 1rst added page		| 5792
+	> 2230 bytes in 2nd added page		| 8022
+
+The second page needs 1866 padding
+
+
+^^^
+|||
+Faux
+
+Le bon nombre de bytes de padding est, WHEN WORKING :
+
+bytes_to_add	-	payload size
+   8192		-	    8022
+
+--> 170 

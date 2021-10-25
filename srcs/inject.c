@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   inject.c                                           :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: user42 <user42@student.42.fr>              +#+  +:+       +#+        */
+/*   By: qroland <qroland@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/10/22 12:07:26 by qroland           #+#    #+#             */
-/*   Updated: 2021/10/24 13:38:27 by user42           ###   ########.fr       */
+/*   Updated: 2021/10/25 14:41:10 by qroland          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -20,17 +20,18 @@ void	write_in_gap(t_elf *elf)
 
 void	write_after_extension(t_elf *elf, t_payload *payload, int pages_to_add)
 {
-	int			bytes_to_add = pages_to_add * PAGE_SIZE;
+	uint64_t	bytes_to_add = pages_to_add * PAGE_SIZE;
+	long		padding = (bytes_to_add > payload->txt_sec->sh_size) ? bytes_to_add - payload->txt_sec->sh_size : payload->txt_sec->sh_size - bytes_to_add;
 	char		*zeros;
-    printf("DEBUG requesting %lu bytes | bytes_to_add is %d | payload size is %lu\n", (bytes_to_add - payload->txt_sec->sh_size), bytes_to_add, payload->txt_sec->sh_size);
-	zeros = malloc((bytes_to_add - payload->txt_sec->sh_size) * sizeof(char));
-	bzero(zeros, bytes_to_add - payload->txt_sec->sh_size);
+    printf("DEBUG requesting %lu bytes | bytes_to_add is %lu | payload size is %lu\n", padding, bytes_to_add, payload->txt_sec->sh_size);
+	zeros = malloc(padding * sizeof(char));
+	bzero(zeros, padding);
 	printf("[*] Writing until injection point			(%lu bytes)\n", elf->injection_point);
 	write_to_output(elf->map, elf->injection_point);
 	printf("[*] Writing payload at injection point			(%lu bytes)\n",payload->txt_sec->sh_size);
 	add_to_output(payload->map + payload->txt_sec->sh_offset, payload->txt_sec->sh_size);
-	printf("[*] Writing additionnal padding				(%lu bytes)\n", bytes_to_add - payload->txt_sec->sh_size);
-	add_to_output(zeros, bytes_to_add - payload->txt_sec->sh_size);
+	printf("[*] Writing additionnal padding				(%lu bytes)\n", padding);
+	add_to_output(zeros, padding);
 	printf("[*] Writing rest of parent file				(%lu bytes)\n", (elf->fsize) - (elf->injection_point));
 	add_to_output(elf->map + elf->injection_point, (elf->fsize) - (elf->injection_point));
 	printf(GRN "[+] Injection complete\n" RES);

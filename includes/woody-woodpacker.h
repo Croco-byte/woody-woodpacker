@@ -6,7 +6,7 @@
 /*   By: qroland <qroland@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/10/16 11:36:10 by user42            #+#    #+#             */
-/*   Updated: 2021/10/25 12:20:20 by qroland          ###   ########.fr       */
+/*   Updated: 2021/10/25 13:46:50 by qroland          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -23,14 +23,14 @@
 # include <string.h>	// Pour memmove ; à supprimer
 # include "elf.h"
 
-# define RES  "\x1B[0m"
-# define RED  "\x1B[31m"
-# define GRN  "\x1B[32m"
-# define YEL  "\x1B[33m"
-# define BLU  "\x1B[34m"
-# define MAG  "\x1B[35m"
-# define CYN  "\x1B[36m"
-# define WHT  "\x1B[37m"
+# define RES 		"\x1B[0m"
+# define RED  		"\x1B[31m"
+# define GRN 		"\x1B[32m"
+# define YEL  		"\x1B[33m"
+# define BLU 		"\x1B[34m"
+# define MAG 		"\x1B[35m"
+# define CYN 		"\x1B[36m"
+# define WHT 	 	"\x1B[37m"
 
 # define PAGE_SIZE		4096
 

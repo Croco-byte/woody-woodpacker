@@ -6,7 +6,7 @@
 /*   By: qroland <qroland@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/10/16 11:35:47 by user42            #+#    #+#             */
-/*   Updated: 2021/10/25 13:15:07 by qroland          ###   ########.fr       */
+/*   Updated: 2021/10/25 13:42:54 by qroland          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -132,7 +132,7 @@ int		main(int argc, char **argv)
 
 /*
 > Regler le cas ou la taille du payload est superieure a bytes_to_add dans extend_and_inject		--> faire un abs()
-> Transformer les strcmp en ft_strcmp
+> Transformer les strcmp en ft_strcmp ; pareil pour les memmove ?
 > Ajouter la description de la mécanique d'extension de segment dans Usage + ajouter des payloads qui illustrent ça
 > Générer la clé aléatoirement
 > Dans "usage", ajouter une section "testing" pour indiquer au correcteur comment tester
