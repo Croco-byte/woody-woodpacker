@@ -6,7 +6,7 @@
 /*   By: qroland <qroland@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/10/16 11:35:47 by user42            #+#    #+#             */
-/*   Updated: 2021/10/25 13:42:54 by qroland          ###   ########.fr       */
+/*   Updated: 2021/10/25 16:05:46 by qroland          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,6 +14,21 @@
 
 void	print_usage(char *prog_name)
 {
+	fprintf(stderr, BLU "\n	=== WOODY-WOPACKER --- Informations ===\n" RES);
+	fprintf(stderr, "Woody-woopacker is a packer that encrypts an ELF64 executable (this type\n");
+	fprintf(stderr, "of packer is known as a Crypter). After encrypting, it will inject in the file a\n");
+	fprintf(stderr, "small piece of executable code that will allow the binary to decrypt itself\n");
+	fprintf(stderr, "before executing. This executable code will be injected at the end of the text\n");
+	fprintf(stderr, "segment. ELF64 segments are aligned to page length (4096 bytes) ; which means\n");
+	fprintf(stderr, "that there often will be some padding at the end of the segment. To maximize stealth\n");
+	fprintf(stderr, "and efficiency, if the padding is big enough for our payload, we will use this space\n");
+	fprintf(stderr, "to inject the payload. If it isn't big enough, we will extend the text segment of the\n");
+	fprintf(stderr, "original file in order to fit the payload.\n");
+	fprintf(stderr, "This crypter can also encrypt PIC (Position Independent Code), by leaking AT RUNTIME\n");
+	fprintf(stderr, "the address space of the program and deducing the rest with offsets. The leak is triggered\n");
+	fprintf(stderr, "by pushing RIP on the stack, and popping it in a general purpose register.\n");
+
+	fprintf(stderr, BLU "\n	=== WOODY-WOPACKER --- Usage ===\n" RES);
 	fprintf(stderr, "Usage: %s <elf-file> <payload> [TYPE] [ENCRYPTION MODE]\n\n",prog_name);
 	fprintf(stderr, "Available options for TYPE :\n");
 	fprintf(stderr, "--PDC:				(default) The binary to pack is position-dependent code.\n");
@@ -33,9 +48,22 @@ void	print_usage(char *prog_name)
 	fprintf(stderr, "				Still a bit experimental, and not available for the --PIC mode.\n\n");
 
 	fprintf(stderr, "Supported PAYLOADS :\n");
-	fprintf(stderr, "Position-dependent, basic encryption:	" YEL "pdc_basic\n" RES);
-	fprintf(stderr, "Position-dependent, full encryption:	" YEL "pdc_full\n" RES);
-	fprintf(stderr, "Position-independent, basic encryption:	" YEL "pic_basic\n" RES);
+	fprintf(stderr, "Position-dependent:	" YEL "pdc_basic | pdc_full\n" RES);
+	fprintf(stderr, "Position-independent:	" YEL "pic_basic\n" RES);
+
+	fprintf(stderr, BLU "\n	=== WOODY-WOPACKER --- Testing ===\n" RES);
+	fprintf(stderr, "Supported payloads are in ./payloads ; some testing exectutables are in ./binaries.\n\n");
+	fprintf(stderr, ">> Testing a classic executable, with basic encryption :\n");
+	fprintf(stderr, "	./woody-woodpacker binaries/binary64 payloads/pdc_basic --PDC --enc-basic\n");
+	fprintf(stderr, ">> Testing a classic executable, with full encryption :\n");
+	fprintf(stderr, "	./woody-woodpacker binaries/binary64 payloads/pdc_basic --PDC --enc-full\n");
+	fprintf(stderr, ">> Testing a PIC executable, with basic encryption :\n");
+	fprintf(stderr, "	./woody-woodpacker binaries/binary64_pic payloads/pic_basic --PIC --enc-basic\n");
+	fprintf(stderr, "\nNote : the segment extension won't trigger very often, since there will generally be enough\n");
+	fprintf(stderr, "space in the text segment padding for the payload. To trigger it, use artificially big payloads\n");
+	fprintf(stderr, "in the ./payloads/big_payloads directory. The synthax is the same, for example :\n");
+	fprintf(stderr, "\n>> Testing a classic executable, with basic encryption, and a big payload to trigger segment extension :\n");
+	fprintf(stderr, "	./woody-woodpacker binaries/binary64 payloads/big_payloads/pdc_basic --PDC --enc-basic\n");
 }
 
 int		parse_flags(int argc, char **argv)
@@ -131,9 +159,9 @@ int		main(int argc, char **argv)
 }
 
 /*
-> Regler le cas ou la taille du payload est superieure a bytes_to_add dans extend_and_inject		--> faire un abs()
 > Transformer les strcmp en ft_strcmp ; pareil pour les memmove ?
-> Ajouter la description de la mécanique d'extension de segment dans Usage + ajouter des payloads qui illustrent ça
 > Générer la clé aléatoirement
-> Dans "usage", ajouter une section "testing" pour indiquer au correcteur comment tester
+> Ajouter sample dans les binaries, verifier que ca fonctionne
+> Only ELF64 files should be accepted
+> Maybe a check for payload file names
  */

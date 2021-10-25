@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   file_utils.c                                       :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: user42 <user42@student.42.fr>              +#+  +:+       +#+        */
+/*   By: qroland <qroland@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/10/18 11:47:53 by user42            #+#    #+#             */
-/*   Updated: 2021/10/24 15:21:21 by user42           ###   ########.fr       */
+/*   Updated: 2021/10/25 15:24:42 by qroland          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -67,7 +67,7 @@ void	*elf_map_file(char *fname, uint64_t *size)
 		fprintf(stderr, RED "[!] Error: couldn't map file %s\n" RES, fname);
 		exit(1);
 	}
-	printf("[*] Mapped file %-20s			%p (%lu bytes)\n", fname, map, *size);
+	printf("[*] Mapped file %-35s	%p (%lu bytes)\n", fname, map, *size);
 	close(fd);
 	return (map);
 }
