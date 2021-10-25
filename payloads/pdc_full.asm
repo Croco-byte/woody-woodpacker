@@ -21,6 +21,11 @@ _start:
 		; Calling mprotect to make encrypted sections before payload writable
 		mov rdi, [rel alignedaddr]
 		mov rsi, [rel size]
+
+		mov r11, [rel startaddr]
+		sub r11, rdi
+		add rsi, r11
+
 		mov rdx, 7
 		mov rax, 10
 		syscall
@@ -40,6 +45,11 @@ _start:
 		; Calling mprotect to make encrypted sections after payload writable
 		mov rdi, [rel aligned2]
 		mov rsi, [rel size2]
+
+		mov r11, [rel startaddr2]
+		sub r11, rdi
+		add rsi, r11
+
 		mov rdx, 7
 		mov rax, 10
 		syscall

@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   woody-woodpacker.h                                 :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: user42 <user42@student.42.fr>              +#+  +:+       +#+        */
+/*   By: qroland <qroland@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/10/16 11:36:10 by user42            #+#    #+#             */
-/*   Updated: 2021/10/24 13:16:52 by user42           ###   ########.fr       */
+/*   Updated: 2021/10/25 12:20:20 by qroland          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -100,6 +100,7 @@ void			elf_find_gap(t_elf *elf);
 Elf64_Shdr		*elf_find_section(void *data, char *sec_name);
 int				elf_mem_subst(void *m, int size, long pat, long val);
 Elf64_Phdr		*elf_find_text_segment(t_elf *elf);
+int				can_encrypt(char *sec_name);
 
 
 

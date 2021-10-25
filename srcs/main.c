@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   main.c                                             :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: user42 <user42@student.42.fr>              +#+  +:+       +#+        */
+/*   By: qroland <qroland@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/10/16 11:35:47 by user42            #+#    #+#             */
-/*   Updated: 2021/10/24 13:42:17 by user42           ###   ########.fr       */
+/*   Updated: 2021/10/25 13:15:07 by qroland          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -131,10 +131,9 @@ int		main(int argc, char **argv)
 }
 
 /*
-> Regler le cas ou la taille du payload est superieure a bytes_to_add in extend_and_inject
-> Changer le nom des payloads et ajouter des règles de compilation sur le Makefile
+> Regler le cas ou la taille du payload est superieure a bytes_to_add dans extend_and_inject		--> faire un abs()
 > Transformer les strcmp en ft_strcmp
 > Ajouter la description de la mécanique d'extension de segment dans Usage + ajouter des payloads qui illustrent ça
 > Générer la clé aléatoirement
-> Dans "usage", ajouter une section "texting" pour indiquer au correcteur comment tester
+> Dans "usage", ajouter une section "testing" pour indiquer au correcteur comment tester
  */

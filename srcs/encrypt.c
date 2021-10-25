@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   encrypt.c                                          :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: user42 <user42@student.42.fr>              +#+  +:+       +#+        */
+/*   By: qroland <qroland@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/10/22 12:01:15 by qroland           #+#    #+#             */
-/*   Updated: 2021/10/24 12:31:26 by user42           ###   ########.fr       */
+/*   Updated: 2021/10/25 12:56:13 by qroland          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -41,18 +41,85 @@ void	encrypt_full(t_elf *elf)
 	Elf64_Shdr *sec_headers = (Elf64_Shdr *)(elf->map + elf->header->e_shoff);
 	Elf64_Shdr *sec_str_h = &(sec_headers[elf->header->e_shstrndx]);
 	char * sec_str_p = elf->map + sec_str_h->sh_offset;
+	size_t j;
+
+	for (size_t i = 0; i < elf->header->e_shnum; i++)
+	{
+		if (!strcmp(sec_str_p + sec_headers[i].sh_name, ".text"))
+		{
+			printf("[*] Encrypting section %s\n", sec_str_p + sec_headers[i].sh_name);
+			elf->enc_start_before = sec_headers[i].sh_addr;
+			elf->enc_size_before += sec_headers[i].sh_size;
+			encrypt_sec(elf, &sec_headers[i]);
+			j = 1;
+			while (can_encrypt(sec_str_p + sec_headers[i - j].sh_name))
+			{
+				printf("[*] Encrypting section %s\n", sec_str_p + sec_headers[i - j].sh_name);
+				elf->enc_start_before = sec_headers[i - j].sh_addr;
+				elf->enc_size_before += sec_headers[i - j].sh_size;
+				encrypt_sec(elf, &sec_headers[i - j]);
+				j++;
+			}
+			j = 1;
+			while (can_encrypt(sec_str_p + sec_headers[i + j].sh_name))
+			{
+				printf("[*] Encrypting section %s\n", sec_str_p + sec_headers[i + j].sh_name);
+				elf->enc_size_before += sec_headers[i + j].sh_size;
+				encrypt_sec(elf, &sec_headers[i + j]);
+				j++;
+			}
+		}
+
+		else if (!strcmp(sec_str_p + sec_headers[i].sh_name, ".data"))
+		{
+			printf("[*] Encrypting section %s\n", sec_str_p + sec_headers[i].sh_name);
+			elf->enc_start_after = sec_headers[i].sh_addr;
+			elf->enc_size_after += sec_headers[i].sh_size;
+			encrypt_sec(elf, &sec_headers[i]);
+			j = 1;
+			while (can_encrypt(sec_str_p + sec_headers[i - j].sh_name))
+			{
+				printf("[*] Encrypting section %s\n", sec_str_p + sec_headers[i - j].sh_name);
+				elf->enc_start_after = sec_headers[i - j].sh_addr;
+				elf->enc_size_after += sec_headers[i - j].sh_size;
+				encrypt_sec(elf, &sec_headers[i - j]);
+				j++;
+			}
+			j = 1;
+			while (can_encrypt(sec_str_p + sec_headers[i + j].sh_name))
+			{
+				printf("[*] Encrypting section %s\n", sec_str_p + sec_headers[i + j].sh_name);
+				elf->enc_size_after += sec_headers[i + j].sh_size;
+				encrypt_sec(elf, &sec_headers[i + j]);
+				j++;
+			}
+		}
+	}
+}
+
+
+
+
+/*
+
+void	encrypt_full(t_elf *elf)
+{
+    printf("[*] Encrypt mode is : FULL\n");
+	Elf64_Shdr *sec_headers = (Elf64_Shdr *)(elf->map + elf->header->e_shoff);
+	Elf64_Shdr *sec_str_h = &(sec_headers[elf->header->e_shstrndx]);
+	char * sec_str_p = elf->map + sec_str_h->sh_offset;
 	size_t j = 0;
 
 	for (size_t i = 0; i < elf->header->e_shnum; i++)
 	{
-		if (!strcmp(sec_str_p + sec_headers[i].sh_name, ".text")
-		|| !strcmp(sec_str_p + sec_headers[i].sh_name, ".data") || !strcmp(sec_str_p + sec_headers[i].sh_name, ".bss"))
+		if (!strcmp(sec_str_p + sec_headers[i].sh_name, ".text"))
 		{
+			
 			printf("[*] Encrypting section %s\n", sec_str_p + sec_headers[i].sh_name);
 			if (sec_headers[i].sh_offset > (elf->text_segment->p_offset + elf->text_segment->p_filesz))
 			{
-					if (elf->enc_size_after == 0)
-				elf->enc_start_after = (long)(sec_headers[i].sh_addr);
+				if (elf->enc_size_after == 0)
+					elf->enc_start_after = (long)(sec_headers[i].sh_addr);
 				j = 0;
 				char		*ptr = (char *)(elf->map + sec_headers[i].sh_offset);
 				while (j < sec_headers[i].sh_size)
@@ -80,3 +147,6 @@ void	encrypt_full(t_elf *elf)
 		}
 	}
 }
+
+
+*/

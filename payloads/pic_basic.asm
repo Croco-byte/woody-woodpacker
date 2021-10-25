@@ -28,8 +28,11 @@ _start:
 
 		; Calling mprotect to make encrypted sections writable (we need to modify them in order to decrypt !)
 		mov rdi, r14
-;		mov rsi, [rel size]
-		mov rsi, 0x30000		; programmer ça
+		mov rsi, [rel size]
+		mov r12, [rel enc_off]
+		add r12, r14
+		sub r12, r14
+		add rsi, r12
 		mov rdx, 7
 		mov rax, 10
 		syscall
@@ -65,7 +68,7 @@ _start:
 align 8
 	debug			db "Once",0x0a,0
 	debug_len		equ $ - debug
-	msg				db "... Woody...",0x0a,0
+	msg				db "... Woody ...",0x0a,0
 	msg_len			equ $ - msg
 	payload_off		dq 0x1111111111111111
 	key				dq 0x2222222222222222
