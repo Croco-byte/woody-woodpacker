@@ -37,7 +37,8 @@ _start:
 		add rcx, rax
 
 	decrypt:
-		xor byte[rax], 0xa5
+		xor byte[rax], dl
+		ror rdx, 8
 		inc rax
 		cmp rax, rcx
 		jne decrypt
@@ -61,7 +62,8 @@ _start:
 		add rcx, rax
 
 	decrypt2:
-		xor byte[rax], 0xa5
+		xor byte[rax], dl
+		ror rdx, 8
 		inc rax
 		cmp rax, rcx
 		jne decrypt2
@@ -80,7 +82,7 @@ _start:
 align 8
 	debug		db "Once",0x0a,0
 	debug_len	equ $ - debug
-	msg			db "... Woody...",0x0a,0
+	msg			db "....WOODY....",0x0a,0
 	msg_len		equ $ - msg
 	retaddr		dq 0x1111111111111111
 	key			dq 0x2222222222222222

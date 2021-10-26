@@ -48,6 +48,7 @@ _start:
 
 	decrypt:
 		xor byte[rax], dl
+		ror rdx, 8
 		inc rax
 		cmp rax, rcx
 		jne decrypt

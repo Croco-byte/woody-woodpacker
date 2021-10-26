@@ -37,7 +37,8 @@ _start:
 		add rcx, rax
 
 	decrypt:
-		xor byte[rax], 0xa5
+		xor byte[rax], dl
+		ror rdx, 8
 		inc rax
 		cmp rax, rcx
 		jne decrypt
@@ -61,7 +62,8 @@ _start:
 		add rcx, rax
 
 	decrypt2:
-		xor byte[rax], 0xa5
+		xor byte[rax], dl
+		ror rdx, 8
 		inc rax
 		cmp rax, rcx
 		jne decrypt2

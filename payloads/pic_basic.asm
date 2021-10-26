@@ -48,6 +48,7 @@ _start:
 
 	decrypt:
 		xor byte[rax], dl
+		ror rdx, 8
 		inc rax
 		cmp rax, rcx
 		jne decrypt
@@ -68,7 +69,7 @@ _start:
 align 8
 	debug			db "Once",0x0a,0
 	debug_len		equ $ - debug
-	msg				db "... Woody ...",0x0a,0
+	msg				db "....WOODY....",0x0a,0
 	msg_len			equ $ - msg
 	payload_off		dq 0x1111111111111111
 	key				dq 0x2222222222222222

@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   woody-woodpacker.h                                 :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: qroland <qroland@student.42.fr>            +#+  +:+       +#+        */
+/*   By: user42 <user42@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/10/16 11:36:10 by user42            #+#    #+#             */
-/*   Updated: 2021/10/25 13:46:50 by qroland          ###   ########.fr       */
+/*   Updated: 2021/10/26 14:40:17 by user42           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -20,7 +20,8 @@
 # include <sys/stat.h>
 # include <sys/mman.h>
 # include <fcntl.h>
-# include <string.h>	// Pour memmove ; à supprimer
+# include <time.h>
+# include <string.h>
 # include "elf.h"
 
 # define RES 		"\x1B[0m"
@@ -43,6 +44,7 @@ typedef struct		s_elf
 	char			*fname;
 	void			*map;
 	uint64_t		fsize;
+	uint64_t		key;
 	Elf64_Ehdr		*header;
 	Elf64_Phdr		*text_segment;
 	Elf64_Off		injection_point;
@@ -103,7 +105,6 @@ Elf64_Phdr		*elf_find_text_segment(t_elf *elf);
 int				can_encrypt(char *sec_name);
 
 
-
 /* FILE UTILITIES (read-write-open-map) */
 int				get_file_size(int fd, char *fname);
 void			write_to_output(void *data, size_t size);
@@ -114,7 +115,10 @@ void			*elf_map_file(char *fname, uint64_t *size);
 /* C UTILITIES */
 size_t			ft_strlen(char *s);
 int				ft_strncmp(const char *s1, const char *s2, size_t n);
+int				ft_strcmp(const char *s1, const char *s2);
 
+/* USAGE PRINTING */
+void			print_usage(char *prog_name);
 
 
 #endif

@@ -6,7 +6,7 @@
 /*   By: user42 <user42@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/10/22 12:04:18 by qroland           #+#    #+#             */
-/*   Updated: 2021/10/24 12:42:02 by user42           ###   ########.fr       */
+/*   Updated: 2021/10/26 13:03:00 by user42           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,15 +19,15 @@ void    patch_payload_basic(t_elf *elf, t_payload *payload)
 	aligned_addr = (elf->enc_start_before);
 	aligned_addr = ((PAGE_SIZE-1)&aligned_addr) ? ((aligned_addr) & ~(PAGE_SIZE-1)) : aligned_addr;
 
-	printf("Patching ret addr to original entry point:		0x%016lx -> 0x%016lx\n", 0x1111111111111111, (long)elf->header->e_entry);
+	printf("[*] Patching ret addr to original entry point:		0x%016lx -> 0x%016lx\n", 0x1111111111111111, (long)elf->header->e_entry);
 	elf_mem_subst(payload->map + payload->txt_sec->sh_offset, payload->txt_sec->sh_size, 0x1111111111111111, (long)elf->header->e_entry);
-	printf("Patching key:						0x%016lx -> 0x%016lx\n", 0x2222222222222222, (long)0xa5);
-	elf_mem_subst(payload->map + payload->txt_sec->sh_offset, payload->txt_sec->sh_size, 0x2222222222222222, (long)0xa5);
-	printf("Patching encrypted sections start (before):		0x%016lx -> 0x%016lx\n", 0x3333333333333333, elf->enc_start_before);
+	printf("[*] Patching key:					0x%016lx -> 0x%016lx\n", 0x2222222222222222, elf->key);
+	elf_mem_subst(payload->map + payload->txt_sec->sh_offset, payload->txt_sec->sh_size, 0x2222222222222222, elf->key);
+	printf("[*] Patching encrypted sections start (before):		0x%016lx -> 0x%016lx\n", 0x3333333333333333, elf->enc_start_before);
 	elf_mem_subst(payload->map + payload->txt_sec->sh_offset, payload->txt_sec->sh_size, 0x3333333333333333, elf->enc_start_before);
-	printf("Patching encrypted sections size (before):		0x%016lx -> 0x%016lx\n", 0x4444444444444444, elf->enc_size_before);
+	printf("[*] Patching encrypted sections size (before):		0x%016lx -> 0x%016lx\n", 0x4444444444444444, elf->enc_size_before);
 	elf_mem_subst(payload->map + payload->txt_sec->sh_offset, payload->txt_sec->sh_size, 0x4444444444444444, elf->enc_size_before);
-	printf("Patching mprotect aligned addr (before):		0x%016lx -> 0x%016lx\n", 0x555555555555555, aligned_addr);
+	printf("[*] Patching mprotect aligned addr (before):		0x%016lx -> 0x%016lx\n", 0x555555555555555, aligned_addr);
 	elf_mem_subst(payload->map + payload->txt_sec->sh_offset, payload->txt_sec->sh_size, 0x5555555555555555, aligned_addr);
 }
 
@@ -43,8 +43,8 @@ void	patch_payload_full(t_elf *elf, t_payload *payload)
 
 	printf("[*] Patching ret addr to original entry point:		0x%016lx -> 0x%016lx\n", 0x1111111111111111, (long)elf->header->e_entry);
 	elf_mem_subst(payload->map + payload->txt_sec->sh_offset, payload->txt_sec->sh_size, 0x1111111111111111, (long)elf->header->e_entry);
-	printf("[*] Patching key:					0x%016lx -> 0x%016lx\n", 0x2222222222222222, (long)0xa5);
-	elf_mem_subst(payload->map + payload->txt_sec->sh_offset, payload->txt_sec->sh_size, 0x2222222222222222, (long)0xa5);
+	printf("[*] Patching key:					0x%016lx -> 0x%016lx\n", 0x2222222222222222, elf->key);
+	elf_mem_subst(payload->map + payload->txt_sec->sh_offset, payload->txt_sec->sh_size, 0x2222222222222222, elf->key);
 	printf("[*] Patching encrypted sections start (before):		0x%016lx -> 0x%016lx\n", 0x3333333333333333, elf->enc_start_before);
 	elf_mem_subst(payload->map + payload->txt_sec->sh_offset, payload->txt_sec->sh_size, 0x3333333333333333, elf->enc_start_before);
 	printf("[*] Patching encrypted sections size (before):		0x%016lx -> 0x%016lx\n", 0x4444444444444444, elf->enc_size_before);
@@ -63,8 +63,8 @@ void	patch_payload_pic(t_elf *elf, t_payload *payload)
 {
 	printf("[*] Patching ret addr offset:				0x%016lx -> 0x%016lx\n", 0x1111111111111111, elf->injection_point - elf->text_segment->p_offset);
 	elf_mem_subst(payload->map + payload->txt_sec->sh_offset, payload->txt_sec->sh_size, 0x1111111111111111, elf->injection_point - elf->text_segment->p_offset);
-	printf("[*] Patching key:					0x%016lx -> 0x%016lx\n", 0x2222222222222222, (long)0xa5);
-	elf_mem_subst(payload->map + payload->txt_sec->sh_offset, payload->txt_sec->sh_size, 0x2222222222222222, (long)0xa5);
+	printf("[*] Patching key:					0x%016lx -> 0x%016lx\n", 0x2222222222222222, elf->key);
+	elf_mem_subst(payload->map + payload->txt_sec->sh_offset, payload->txt_sec->sh_size, 0x2222222222222222, elf->key);
 	printf("[*] Patching encrypted code offset:			0x%016lx -> 0x%016lx\n", 0x3333333333333333, elf->enc_start_before - elf->text_segment->p_vaddr);
 	elf_mem_subst(payload->map + payload->txt_sec->sh_offset, payload->txt_sec->sh_size, 0x3333333333333333, elf->enc_start_before - elf->text_segment->p_vaddr);
 	printf("[*] Patching encrypted size:				0x%016lx -> 0x%016lx\n", 0x4444444444444444, elf->enc_size_before);
