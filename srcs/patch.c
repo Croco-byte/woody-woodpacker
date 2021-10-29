@@ -6,15 +6,15 @@
 /*   By: user42 <user42@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/10/22 12:04:18 by qroland           #+#    #+#             */
-/*   Updated: 2021/10/26 13:03:00 by user42           ###   ########.fr       */
+/*   Updated: 2021/10/29 15:35:29 by user42           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "woody-woodpacker.h"
 
-void    patch_payload_basic(t_elf *elf, t_payload *payload)
+void	patch_payload_basic(t_elf *elf, t_payload *payload)
 {
-    Elf64_Addr	aligned_addr;
+	Elf64_Addr	aligned_addr;
 
 	aligned_addr = (elf->enc_start_before);
 	aligned_addr = ((PAGE_SIZE-1)&aligned_addr) ? ((aligned_addr) & ~(PAGE_SIZE-1)) : aligned_addr;

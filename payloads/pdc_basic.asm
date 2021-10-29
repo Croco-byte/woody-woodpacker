@@ -56,8 +56,6 @@ _start:
 		jmp r15
 
 align 8
-	debug		db "Once",0x0a,0
-	debug_len	equ $ - debug
 	msg			db "....WOODY....",0x0a,0
 	msg_len		equ $ - msg
 	retaddr		dq 0x1111111111111111
